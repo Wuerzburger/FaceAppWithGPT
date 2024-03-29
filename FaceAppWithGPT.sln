@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceAppWithGPT", "FaceAppWithGPT\FaceAppWithGPT.csproj", "{6D47297A-8FEE-4652-9BB5-CA544000BDE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FaceAppWithGPT.Tests", "FaceAppWithGPT.Tests\FaceAppWithGPT.Tests.csproj", "{6C32396E-561E-4CC6-94F7-C087626F87B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6D47297A-8FEE-4652-9BB5-CA544000BDE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D47297A-8FEE-4652-9BB5-CA544000BDE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D47297A-8FEE-4652-9BB5-CA544000BDE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C32396E-561E-4CC6-94F7-C087626F87B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C32396E-561E-4CC6-94F7-C087626F87B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C32396E-561E-4CC6-94F7-C087626F87B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C32396E-561E-4CC6-94F7-C087626F87B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
