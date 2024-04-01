@@ -6,10 +6,10 @@ try
     var options = CliParser.ParseArguments(args);
     if (options != null)
     {
-        // Proceed with the application flow using parsed options
-        Console.WriteLine("Command-line options parsed successfully.");
-        // Implementation for using options in the application's workflow
+        var dispatcher = new CommandDispatcher();
+        dispatcher.Dispatch(options);
     }
+
 }
 catch (Exception ex)
 {
