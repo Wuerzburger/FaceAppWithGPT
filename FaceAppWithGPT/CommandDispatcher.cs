@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,10 @@ namespace FaceAppWithGPT
 
         public CommandDispatcher()
         {
+            var fileSystem = new FileSystem(); // Concrete implementation for actual file operations
             handlers = new List<ICommandHandler>
             {
-                new ImageResizeHandler(),
+                new ImageResizeHandler(fileSystem),
                 new ImageAlignmentHandler(),
                 new FaceMorphingHandler(),
                 new VideoGenerationHandler()
