@@ -1,25 +1,36 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using CommandLine;
 using FaceAppWithGPT;
 using Serilog;
 
 try
 {
+    // Instantiate services
     var imageProcessingService = new ImageProcessingService();
     var videoGenerationService = new VideoGenerationService();
     var dispatcher = new CommandDispatcher(imageProcessingService, videoGenerationService);
 
-    Log.Information("Application starting up");
-    var options = CliParser.ParseArguments(args);
-    if (options != null)
-    {
-        Log.Information("CLI parsing succeeded");
-        dispatcher.Dispatch(options);
-    }
-    else
-    {
-        Log.Warning("CLI parsing failed or resulted in no operation");
-    }
-
+    // Parse CLI arguments and handle results
+    Parser.Default.ParseArguments<CliOptions>(args)
+          .WithParsed(options =>
+          {
+              Log.Information("CLI parsing succeeded");
+              dispatcher.Dispatch(options); // Dispatch commands based on parsed options
+          })
+          .WithNotParsed(errors =>
+          {
+              // Handle parsing errors, such as missing required arguments or help request
+              // CommandLineParser automatically handles help text display for '-h' or '--help'
+              if (errors.IsVersion() || errors.IsHelp())
+              {
+                  // Version or help text requested, handled internally by CommandLineParser
+              }
+              else
+              {
+                  Log.Warning("CLI parsing failed or resulted in no operation");
+                  // Optionally, provide additional instructions or direct users to detailed documentation
+              }
+          });
 }
 catch (Exception ex)
 {
@@ -27,5 +38,5 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush(); // Ensures all logs are flushed and logged before application exit
+    Log.CloseAndFlush(); // Ensure all logs are flushed before application exit
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FaceAppWithGPT": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

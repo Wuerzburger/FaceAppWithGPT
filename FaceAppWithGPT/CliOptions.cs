@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
+using CommandLine.Text;
 
 namespace FaceAppWithGPT
 {
@@ -35,5 +36,16 @@ namespace FaceAppWithGPT
         public int Pause { get; set; } = 1; // Default value, adjust as needed
 
         // Additional CLI options can be defined here.
+
+        public static void DisplayHelp<T>(ParserResult<T> result)
+        {
+            var helpText = HelpText.AutoBuild(result, h =>
+            {
+                // Customize HelpText here if needed before returning
+                return HelpText.DefaultParsingErrorsHandler(result, h);
+            }, e => e);
+
+            Console.WriteLine(helpText);
+        }
     }
 }
