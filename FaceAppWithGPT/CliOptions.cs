@@ -28,6 +28,12 @@ namespace FaceAppWithGPT
         [Option('n', "output-name", Required = true, HelpText = "Specify the name of the output video file.")]
         public string OutputName { get; set; }
 
+        [Option('d', "duration", Required = false, HelpText = "Specify the overall duration of how long it takes to morph from one picture to another.")]
+        public int Duration { get; set; } = 1; // Default value, adjust as needed
+
+        [Option('p', "pause", Required = false, HelpText = "Specify the duration on how long the second picture after the morphing is displayed until a new morphing sequence is started.")]
+        public int Pause { get; set; } = 1; // Default value, adjust as needed
+
         // Additional CLI options can be defined here.
     }
 }

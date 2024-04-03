@@ -9,23 +9,22 @@ namespace FaceAppWithGPT
 {
     public class CommandDispatcher
     {
-        private readonly List<ICommandHandler> handlers;
+        private readonly List<ICommandHandler> _handlers;
 
-        public CommandDispatcher()
+        public CommandDispatcher(IImageProcessingService imageProcessingService, IVideoGenerationService videoGenerationService)
         {
-            var fileSystem = new FileSystem(); // Concrete implementation for actual file operations
-            handlers = new List<ICommandHandler>
-            {
-                new ImageResizeHandler(fileSystem),
-                new ImageAlignmentHandler(),
-                new FaceMorphingHandler(),
-                new VideoGenerationHandler()
-            };
+            _handlers = new List<ICommandHandler>
+        {
+            new ImageResizeHandler(imageProcessingService),
+            new ImageAlignmentHandler(imageProcessingService),
+            new FaceMorphingHandler(imageProcessingService),
+            new VideoGenerationHandler(videoGenerationService)
+        };
         }
 
         public void Dispatch(CliOptions options)
         {
-            foreach (var handler in handlers)
+            foreach (var handler in _handlers)
             {
                 handler.HandleCommand(options);
             }

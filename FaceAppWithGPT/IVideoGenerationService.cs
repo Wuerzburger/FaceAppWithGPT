@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace FaceAppWithGPT
 {
-    public interface IImageProcessor
+    public interface IVideoGenerationService
     {
+        void GenerateVideo(string sourceDirectory, string outputFilePath, int fps);
     }
 }

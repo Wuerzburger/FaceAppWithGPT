@@ -3,10 +3,13 @@ using FaceAppWithGPT;
 
 try
 {
+    var imageProcessingService = new ImageProcessingService();
+    var videoGenerationService = new VideoGenerationService();
+    var dispatcher = new CommandDispatcher(imageProcessingService, videoGenerationService);
+
     var options = CliParser.ParseArguments(args);
     if (options != null)
     {
-        var dispatcher = new CommandDispatcher();
         dispatcher.Dispatch(options);
     }
 

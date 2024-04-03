@@ -11,15 +11,16 @@ namespace FaceAppWithGPT
     {
         private readonly IFileSystem _fileSystem;
 
-        public ImageResizeHandler(IFileSystem fileSystem)
+        private readonly IImageProcessingService _imageProcessingService;
+
+        public ImageResizeHandler(IImageProcessingService imageProcessingService)
         {
-            _fileSystem = fileSystem;
+            _imageProcessingService = imageProcessingService;
         }
 
         public void HandleCommand(CliOptions options)
         {
-            // Implement the resize logic using _fileSystem
-            Console.WriteLine("Resizing images...");
+            _imageProcessingService.ResizeImages(options.SourceDirectory, options.OutputDirectory, options.Resize);
         }
     }
 }

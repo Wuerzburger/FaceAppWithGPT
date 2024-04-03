@@ -8,10 +8,16 @@ namespace FaceAppWithGPT
 {
     public class ImageAlignmentHandler : ICommandHandler
     {
+        private readonly IImageProcessingService _imageProcessingService;
+
+        public ImageAlignmentHandler(IImageProcessingService imageProcessingService)
+        {
+            _imageProcessingService = imageProcessingService;
+        }
+
         public void HandleCommand(CliOptions options)
         {
-            // Logic to align images based on options.ReferenceImage
-            Console.WriteLine("Aligning images...");
+            _imageProcessingService.AlignImages(options.SourceDirectory, options.OutputDirectory, options.ReferenceImage);
         }
     }
 }

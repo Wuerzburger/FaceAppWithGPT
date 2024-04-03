@@ -8,10 +8,16 @@ namespace FaceAppWithGPT
 {
     public class FaceMorphingHandler : ICommandHandler
     {
+        private readonly IImageProcessingService _imageProcessingService;
+
+        public FaceMorphingHandler(IImageProcessingService imageProcessingService)
+        {
+            _imageProcessingService = imageProcessingService;
+        }
+
         public void HandleCommand(CliOptions options)
         {
-            // Logic for face morphing
-            Console.WriteLine("Morphing faces...");
+            _imageProcessingService.MorphFaces(options.SourceDirectory, options.OutputDirectory, options.Duration, options.Pause);
         }
     }
 }

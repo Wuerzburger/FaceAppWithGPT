@@ -8,10 +8,16 @@ namespace FaceAppWithGPT
 {
     public class VideoGenerationHandler : ICommandHandler
     {
+        private readonly IVideoGenerationService _videoGenerationService;
+
+        public VideoGenerationHandler(IVideoGenerationService videoGenerationService)
+        {
+            _videoGenerationService = videoGenerationService;
+        }
+
         public void HandleCommand(CliOptions options)
         {
-            // Logic for generating video from images
-            Console.WriteLine("Generating video...");
+            _videoGenerationService.GenerateVideo(options.SourceDirectory, options.OutputName, options.FramesPerSecond);
         }
     }
 }
