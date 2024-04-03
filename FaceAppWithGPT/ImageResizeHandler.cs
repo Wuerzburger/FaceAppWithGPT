@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
@@ -20,7 +21,17 @@ namespace FaceAppWithGPT
 
         public void HandleCommand(CliOptions options)
         {
-            _imageProcessingService.ResizeImages(options.SourceDirectory, options.OutputDirectory, options.Resize);
+            Log.Information("Starting image resize process for {SourceDirectory}", options.SourceDirectory);
+            try
+            {
+                _imageProcessingService.ResizeImages(options.SourceDirectory, options.OutputDirectory, options.Resize);
+                Log.Information("Image resize process completed successfully for {SourceDirectory}", options.SourceDirectory);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred during image resize process for {SourceDirectory}", options.SourceDirectory);
+                throw;
+            }
         }
     }
 }

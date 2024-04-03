@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
@@ -24,9 +25,19 @@ namespace FaceAppWithGPT
 
         public void Dispatch(CliOptions options)
         {
-            foreach (var handler in _handlers)
+            Log.Information("Dispatching command based on CLI options");
+
+            try
             {
-                handler.HandleCommand(options);
+                foreach (var handler in _handlers)
+                {
+                    handler.HandleCommand(options);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occurred during command dispatching");
+                throw; // Depending on your error handling strategy, you might not want to rethrow.
             }
         }
     }
