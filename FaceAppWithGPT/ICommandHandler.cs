@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace FaceAppWithGPT
 {
-    public interface IImageProcessor
+    public interface ICommandHandler
     {
+        //void HandleCommandAsync(CliOptions options);
+        Task HandleCommandAsync(CliOptions options);
     }
 }
