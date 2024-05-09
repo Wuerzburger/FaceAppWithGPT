@@ -10,22 +10,19 @@ namespace FaceAppWithGPT.Tests
     [TestClass]
     public class ImageAlignmentHandlerTests
     {
-        /*
         [TestMethod]
-        public void HandlesAlignmentCorrectly()
+        public async Task Given_ValidInput_When_HandleCommandAsync_Then_AlignImages()
         {
-            // Setup
-            var mockProcessor = new Mock<IImageProcessor>();
-            var handler = new ImageAlignmentHandler(mockProcessor.Object);
-            var options = new CliOptions(); // Populate with necessary options
+            // Given
+            var mockProcessingService = new Mock<IImageProcessingService>();
+            var handler = new ImageAlignmentHandler(mockProcessingService.Object);
+            var options = new CliOptions { SourceDirectory = "source", OutputDirectory = "output", ReferenceImage = "ref.jpg" };
 
-            // Act
-            handler.HandleCommand(options);
+            // When
+            await handler.HandleCommandAsync(options);
 
-            // Assert
-            // Verify that the mockProcessor was used as expected, e.g.,
-            mockProcessor.Verify(p => p.AlignImages(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            // Then
+            mockProcessingService.Verify(s => s.AlignImagesAsync("source", "output", "ref.jpg"), Times.Once);
         }
-        */
     }
 }

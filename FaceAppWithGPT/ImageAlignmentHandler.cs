@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace FaceAppWithGPT
 
         public async Task HandleCommandAsync(CliOptions options)
         {
+            Log.Information("Processing image alignment for {SourceDirectory}", options.SourceDirectory);
             await _imageProcessingService.AlignImagesAsync(options.SourceDirectory, options.OutputDirectory, options.ReferenceImage);
         }
 

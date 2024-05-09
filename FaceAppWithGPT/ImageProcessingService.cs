@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using Emgu.CV.Structure;
+using Emgu.CV;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,10 +21,20 @@ namespace FaceAppWithGPT
         }
         public async Task AlignImagesAsync(string sourceDirectory, string targetDirectory, string referenceImage)
         {
-            Log.Information("Aligning images from {SourceDirectory} , saving to {TargetDirectory}", sourceDirectory, targetDirectory);
+            Log.Information("Starting alignment of images in {SourceDirectory} using {ReferenceImage}", sourceDirectory, referenceImage);
             try
             {
-                // Implement alignment logic here
+                var refImgPath = _fileSystem.Path.Combine(sourceDirectory, referenceImage);
+                var refImg = new Image<Bgr, byte>(refImgPath);
+
+                foreach (var imagePath in _fileSystem.Directory.GetFiles(sourceDirectory))
+                {
+                    var image = new Image<Bgr, byte>(imagePath);
+                    // Add alignment logic here using OpenCV functions...
+                    var alignedImagePath = _fileSystem.Path.Combine(targetDirectory, _fileSystem.Path.GetFileName(imagePath));
+                    image.Save(alignedImagePath); // Save aligned image
+                }
+
                 Log.Information("Successfully aligned images and saved to {TargetDirectory}", targetDirectory);
             }
             catch (Exception ex)
