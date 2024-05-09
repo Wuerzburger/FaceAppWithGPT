@@ -19,12 +19,16 @@ namespace FaceAppWithGPT
             _imageProcessingService = imageProcessingService;
         }
 
-        public void HandleCommand(CliOptions options)
+        public async Task HandleCommandAsync(CliOptions options)
         {
             Log.Information("Starting image resize process for {SourceDirectory}", options.SourceDirectory);
             try
             {
-                _imageProcessingService.ResizeImages(options.SourceDirectory, options.OutputDirectory, options.Resize);
+                var sizeParts = options.Resize.Split('x');
+                int width = int.Parse(sizeParts[0]);
+                int height = int.Parse(sizeParts[1]);
+
+                await _imageProcessingService.ResizeImagesAsync(options.SourceDirectory, options.OutputDirectory, width, height);
                 Log.Information("Image resize process completed successfully for {SourceDirectory}", options.SourceDirectory);
             }
             catch (Exception ex)

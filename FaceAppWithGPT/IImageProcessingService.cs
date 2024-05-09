@@ -8,8 +8,9 @@ namespace FaceAppWithGPT
 {
     public interface IImageProcessingService
     {
-        void ResizeImages(string sourceDirectory, string targetDirectory, string size);
-        void AlignImages(string sourceDirectory, string targetDirectory, string referenceImage);
-        void MorphFaces(string sourceDirectory, string targetDirectory, int duration, int pause);
+        Task ResizeImagesAsync(string sourceDirectory, string targetDirectory, int width, int height);
+        Task AlignImagesAsync(string sourceDirectory, string targetDirectory, string referenceImage);
+        Task MorphFacesAsync(string sourceDirectory, string targetDirectory, int duration, int pause);
     }
+
 }

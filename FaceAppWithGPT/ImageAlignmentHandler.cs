@@ -15,9 +15,10 @@ namespace FaceAppWithGPT
             _imageProcessingService = imageProcessingService;
         }
 
-        public void HandleCommand(CliOptions options)
+        public async Task HandleCommandAsync(CliOptions options)
         {
-            _imageProcessingService.AlignImages(options.SourceDirectory, options.OutputDirectory, options.ReferenceImage);
+            await _imageProcessingService.AlignImagesAsync(options.SourceDirectory, options.OutputDirectory, options.ReferenceImage);
         }
+
     }
 }

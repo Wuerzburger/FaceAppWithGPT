@@ -13,24 +13,23 @@ namespace FaceAppWithGPT.Tests
     public class ImageResizeHandlerTests
     {
         [TestMethod]
-        public void ResizeImages_CallsProcessingService_WithCorrectParameters()
+        public async Task HandleCommand_ResizesImages()
         {
             // Arrange
-            var mockImageProcessingService = new Mock<IImageProcessingService>();
-            var handler = new ImageResizeHandler(mockImageProcessingService.Object);
+            var mockProcessingService = new Mock<IImageProcessingService>();
+            var handler = new ImageResizeHandler(mockProcessingService.Object);
             var options = new CliOptions
             {
                 SourceDirectory = "source",
-                OutputDirectory = "output",
+                OutputDirectory = "destination",
                 Resize = "800x600"
             };
 
             // Act
-            handler.HandleCommand(options);
+            await handler.HandleCommandAsync(options); // Updated to async
 
             // Assert
-            mockImageProcessingService.Verify(service =>
-                service.ResizeImages("source", "output", "800x600"), Times.Once);
+            mockProcessingService.Verify(s => s.ResizeImagesAsync("source", "destination", 800, 600), Times.Once);
         }
     }
 }

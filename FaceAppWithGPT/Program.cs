@@ -2,11 +2,13 @@
 using CommandLine;
 using FaceAppWithGPT;
 using Serilog;
+using System.IO.Abstractions;
 
 try
 {
     // Instantiate services
-    var imageProcessingService = new ImageProcessingService();
+    var fileSystem = new FileSystem(); // Create an instance of IFileSystem
+    var imageProcessingService = new ImageProcessingService(fileSystem);
     var videoGenerationService = new VideoGenerationService();
     var dispatcher = new CommandDispatcher(imageProcessingService, videoGenerationService);
 

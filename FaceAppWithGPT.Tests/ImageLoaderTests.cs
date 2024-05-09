@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 
 namespace FaceAppWithGPT.Tests
@@ -9,47 +7,41 @@ namespace FaceAppWithGPT.Tests
     [TestClass]
     public class ImageLoaderTests
     {
-        private readonly string _testDirectoryPath = Path.Combine(Path.GetTempPath(), "ImageLoaderTests");
+        private MockFileSystem _mockFileSystem;
+        private ImageLoader _imageLoader;
 
         [TestInitialize]
         public void Setup()
         {
-            // Setup a temporary directory with test images
-            Directory.CreateDirectory(_testDirectoryPath);
-            File.WriteAllText(Path.Combine(_testDirectoryPath, "image1.jpg"), "Image 1 content");
-            File.WriteAllText(Path.Combine(_testDirectoryPath, "image2.png"), "Image 2 content");
-            File.WriteAllText(Path.Combine(_testDirectoryPath, "document.txt"), "Not an image content");
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            // Cleanup the test directory after each test
-            Directory.Delete(_testDirectoryPath, true);
+            _mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { @"C:\images\image1.jpg", new MockFileData("dummy content") },
+                { @"C:\images\image2.png", new MockFileData("dummy content") }
+            });
+            _imageLoader = new ImageLoader(_mockFileSystem);
         }
 
         [TestMethod]
-        public async Task LoadImagesAsync_ReturnsCorrectNumberOfImages()
+        public async Task Given_ExistingDirectory_When_LoadImagesAsync_Then_ReturnImagePaths()
         {
             // Given
-            var imageLoader = new ImageLoader();
+            var directoryPath = @"C:\images";
 
             // When
-            var images = await imageLoader.LoadImagesAsync(_testDirectoryPath);
+            var result = await _imageLoader.LoadImagesAsync(directoryPath);
 
             // Then
-            Assert.AreEqual(2, images.Count(), "Expected to find 2 images in the test directory.");
+            Assert.AreEqual(2, result.Count());
         }
 
         [TestMethod]
-        public async Task LoadImagesAsync_ThrowsWhenDirectoryDoesNotExist()
+        public async Task Given_NonExistingDirectory_When_LoadImagesAsync_Then_ThrowDirectoryNotFoundException()
         {
             // Given
-            var imageLoader = new ImageLoader();
-            var nonExistentDirectory = Path.Combine(_testDirectoryPath, "nonexistent");
+            var directoryPath = @"C:\nonexistent";
 
             // When & Then
-            await Assert.ThrowsExceptionAsync<DirectoryNotFoundException>(() => imageLoader.LoadImagesAsync(nonExistentDirectory));
+            await Assert.ThrowsExceptionAsync<DirectoryNotFoundException>(() => _imageLoader.LoadImagesAsync(directoryPath));
         }
     }
 }

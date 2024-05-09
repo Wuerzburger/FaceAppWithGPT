@@ -15,7 +15,7 @@ namespace FaceAppWithGPT
             _videoGenerationService = videoGenerationService;
         }
 
-        public void HandleCommand(CliOptions options)
+        public async Task HandleCommandAsync(CliOptions options)
         {
             _videoGenerationService.GenerateVideo(options.SourceDirectory, options.OutputName, options.FramesPerSecond);
         }

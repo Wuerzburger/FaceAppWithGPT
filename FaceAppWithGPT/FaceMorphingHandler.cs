@@ -15,9 +15,9 @@ namespace FaceAppWithGPT
             _imageProcessingService = imageProcessingService;
         }
 
-        public void HandleCommand(CliOptions options)
+        public async Task HandleCommandAsync(CliOptions options)
         {
-            _imageProcessingService.MorphFaces(options.SourceDirectory, options.OutputDirectory, options.Duration, options.Pause);
+            await _imageProcessingService.MorphFacesAsync(options.SourceDirectory, options.OutputDirectory, options.Duration, options.Pause);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace FaceAppWithGPT
             {
                 foreach (var handler in _handlers)
                 {
-                    handler.HandleCommand(options);
+                    handler.HandleCommandAsync(options);
                 }
             }
             catch (Exception ex)

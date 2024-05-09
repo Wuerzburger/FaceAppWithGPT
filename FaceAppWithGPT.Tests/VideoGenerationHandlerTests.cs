@@ -24,7 +24,7 @@ namespace FaceAppWithGPT.Tests
             };
 
             // Act
-            handler.HandleCommand(options);
+            handler.HandleCommandAsync(options);
 
             // Assert
             mockVideoGenerationService.Verify(service =>

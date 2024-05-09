@@ -8,6 +8,7 @@ namespace FaceAppWithGPT
 {
     public interface ICommandHandler
     {
-        void HandleCommand(CliOptions options);
+        //void HandleCommandAsync(CliOptions options);
+        Task HandleCommandAsync(CliOptions options);
     }
 }
