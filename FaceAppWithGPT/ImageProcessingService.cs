@@ -14,11 +14,14 @@ namespace FaceAppWithGPT
     public class ImageProcessingService : IImageProcessingService
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ImageResizer _imageResizer;
 
-        public ImageProcessingService(IFileSystem fileSystem)
+        public ImageProcessingService(IFileSystem fileSystem, ImageResizer imageResizer)
         {
             _fileSystem = fileSystem;
+            _imageResizer = imageResizer;
         }
+
         public async Task AlignImagesAsync(string sourceDirectory, string targetDirectory, string referenceImage)
         {
             Log.Information("Starting alignment of images in {SourceDirectory} using {ReferenceImage}", sourceDirectory, referenceImage);
@@ -50,11 +53,18 @@ namespace FaceAppWithGPT
         }
         public async Task ResizeImagesAsync(string sourceDirectory, string targetDirectory, int width, int height)
         {
-            Log.Information("Resizing images from {SourceDirectory} to {Width}x{Height}, saving to {TargetDirectory}", sourceDirectory, width, height, targetDirectory);
+            Log.Information("Starting resizing of images in {SourceDirectory} to {Width}x{Height}, saving to {TargetDirectory}", sourceDirectory, width, height, targetDirectory);
             try
             {
-                // Implement resizing logic here
-                // Example: assuming the operation was successful
+                var files = _fileSystem.Directory.GetFiles(sourceDirectory, "*.*", SearchOption.TopDirectoryOnly)
+                                .Where(file => file.EndsWith(".jpg") || file.EndsWith(".jpeg") || file.EndsWith(".png"));
+
+                foreach (var file in files)
+                {
+                    var destinationPath = _fileSystem.Path.Combine(targetDirectory, _fileSystem.Path.GetFileName(file));
+                    await _imageResizer.ResizeImageAsync(file, destinationPath, width, height);
+                }
+
                 Log.Information("Successfully resized images and saved to {TargetDirectory}", targetDirectory);
             }
             catch (Exception ex)
