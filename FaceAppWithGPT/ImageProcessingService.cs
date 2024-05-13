@@ -18,11 +18,13 @@ namespace FaceAppWithGPT
     {
         private readonly IFileSystem _fileSystem;
         private readonly ImageResizer _imageResizer;
+        private readonly ImageAligner _aligner;
 
-        public ImageProcessingService(IFileSystem fileSystem, ImageResizer imageResizer)
+        public ImageProcessingService(IFileSystem fileSystem, ImageResizer resizer, ImageAligner aligner)
         {
             _fileSystem = fileSystem;
-            _imageResizer = imageResizer;
+            _imageResizer = resizer;
+            _aligner = aligner;
         }
 
         public async Task AlignImagesAsync(string sourceDirectory, string targetDirectory, string referenceImage)
@@ -30,47 +32,13 @@ namespace FaceAppWithGPT
             Log.Information("Starting alignment of images in {SourceDirectory} using {ReferenceImage}", sourceDirectory, referenceImage);
             try
             {
-                string refImagePath = _fileSystem.Path.Combine(sourceDirectory, referenceImage);
-                var refImg = new Mat(refImagePath, ImreadModes.Color);
-                var refKeyPoints = new VectorOfKeyPoint();
-                var refDescriptors = new Mat();
-
-                using (var featureDetector = new SIFT())
-                {
-                    featureDetector.DetectAndCompute(refImg, null, refKeyPoints, refDescriptors, false);
-                }
+                var refImagePath = _fileSystem.Path.Combine(sourceDirectory, referenceImage);
 
                 foreach (var imagePath in _fileSystem.Directory.GetFiles(sourceDirectory))
                 {
-                    if (imagePath.EndsWith(".jpg") || imagePath.EndsWith(".jpeg") || imagePath.EndsWith(".png"))
-                    {
-                        var img = new Mat(imagePath, ImreadModes.Color);
-                        var keyPoints = new VectorOfKeyPoint();
-                        var descriptors = new Mat();
-
-                        using (var featureDetector = new SIFT())
-                        {
-                            featureDetector.DetectAndCompute(img, null, keyPoints, descriptors, false);
-                        }
-
-                        var matcher = new BFMatcher(DistanceType.L2);
-                        var matches = new VectorOfVectorOfDMatch();
-                        matcher.KnnMatch(refDescriptors, descriptors, matches, 2);
-
-                        // Filter matches using Lowe's ratio test
-                        var goodMatches = new VectorOfDMatch();
-                        for (int i = 0; i < matches.Size; i++)
-                        {
-                            if (matches[i].Size >= 2 && matches[i][0].Distance < 0.75 * matches[i][1].Distance)
-                            {
-                                goodMatches.Push(new[] { matches[i][0] });
-                            }
-                        }
-
-                        // Align and save the image
-                        var alignedImage = AlignImage(refImg, img, refKeyPoints, keyPoints, goodMatches);
-                        alignedImage.Save(_fileSystem.Path.Combine(targetDirectory, _fileSystem.Path.GetFileName(imagePath)));
-                    }
+                    var alignedImage = _aligner.AlignImage(refImagePath, imagePath);
+                    var savePath = _fileSystem.Path.Combine(targetDirectory, _fileSystem.Path.GetFileName(imagePath));
+                    alignedImage.Save(savePath);
                 }
 
                 Log.Information("Successfully aligned images and saved to {TargetDirectory}", targetDirectory);
@@ -80,24 +48,6 @@ namespace FaceAppWithGPT
                 Log.Error(ex, "Failed to align images from {SourceDirectory}", sourceDirectory);
                 throw;
             }
-        }
-
-        private Mat AlignImage(Mat refImg, Mat img, VectorOfKeyPoint refKeyPoints, VectorOfKeyPoint keyPoints, VectorOfDMatch matches)
-        {
-            // Extract points and compute homography
-            var pts1 = new VectorOfPointF();
-            var pts2 = new VectorOfPointF();
-
-            for (int i = 0; i < matches.Size; i++)
-            {
-                pts1.Push(new[] { refKeyPoints[matches[i].TrainIdx].Point });
-                pts2.Push(new[] { keyPoints[matches[i].QueryIdx].Point });
-            }
-
-            var homography = CvInvoke.FindHomography(pts2, pts1, HomographyMethod.Ransac, 5);
-            var aligned = new Mat();
-            CvInvoke.WarpPerspective(img, aligned, homography, refImg.Size);
-            return aligned;
         }
 
         public Task MorphFacesAsync(string sourceDirectory, string targetDirectory, int duration, int pause)

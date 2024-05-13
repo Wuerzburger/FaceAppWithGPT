@@ -9,7 +9,8 @@ try
     // Instantiate services
     var fileSystem = new FileSystem(); // Create an instance of IFileSystem
     var imageResizer = new ImageResizer(fileSystem); // Create an instance of ImageResizer
-    var imageProcessingService = new ImageProcessingService(fileSystem, imageResizer); // Now passing both fileSystem and imageResizer
+    var imageAligner = new ImageAligner(fileSystem);
+    var imageProcessingService = new ImageProcessingService(fileSystem, imageResizer, imageAligner); // Now passing both fileSystem and imageResizer
     var videoGenerationService = new VideoGenerationService();
     var dispatcher = new CommandDispatcher(imageProcessingService, videoGenerationService);
 

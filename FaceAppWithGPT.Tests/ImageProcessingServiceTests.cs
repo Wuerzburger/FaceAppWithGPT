@@ -12,17 +12,21 @@ namespace FaceAppWithGPT.Tests
     public class ImageProcessingServiceTests
     {
         [TestMethod]
-        public async Task Given_ValidInput_When_AlignImagesAsync_Then_CompleteWithoutError()
+        public async Task AlignImagesAsync_ShouldAlignImagesCorrectly()
         {
             // Given
             var fileSystemMock = new Mock<IFileSystem>();
-            var service = new ImageProcessingService(fileSystemMock.Object);
+            var alignerMock = new Mock<ImageAligner>(fileSystemMock.Object);
+            var service = new ImageProcessingService(fileSystemMock.Object, null, alignerMock.Object);
+            string sourceDirectory = "source";
+            string targetDirectory = "target";
+            string referenceImage = "ref.jpg";
 
             // When
-            await service.AlignImagesAsync("source", "target", "reference.jpg");
+            await service.AlignImagesAsync(sourceDirectory, targetDirectory, referenceImage);
 
             // Then
-            // Assert that files are processed, logged, etc.
+            alignerMock.Verify(a => a.AlignImage(It.IsAny<string>(), It.IsAny<string>()), Times.AtLeastOnce());
         }
     }
 }
