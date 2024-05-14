@@ -8,6 +8,8 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Emgu.CV.CvEnum;
+using System.Drawing;
 
 namespace FaceAppWithGPT
 {
@@ -22,47 +24,51 @@ namespace FaceAppWithGPT
 
         public Mat AlignImage(string referenceImagePath, string imagePath)
         {
-            var refImg = new Image<Bgr, byte>(_fileSystem.File.OpenRead(referenceImagePath)).Mat;
-            var image = new Image<Bgr, byte>(_fileSystem.File.OpenRead(imagePath)).Mat;
+            // Correctly read images from file paths
+            var refImg = CvInvoke.Imread(_fileSystem.Path.Combine(referenceImagePath), ImreadModes.Color);
+            var image = CvInvoke.Imread(_fileSystem.Path.Combine(imagePath), ImreadModes.Color);
 
             using var featureDetector = new SIFT();
             var refKeyPoints = new VectorOfKeyPoint();
+            var imageKeyPoints = new VectorOfKeyPoint();
             var refDescriptors = new Mat();
-            featureDetector.DetectAndCompute(refImg, null, refKeyPoints, refDescriptors, false);
+            var imageDescriptors = new Mat();
 
-            var keyPoints = new VectorOfKeyPoint();
-            var descriptors = new Mat();
-            featureDetector.DetectAndCompute(image, null, keyPoints, descriptors, false);
+            featureDetector.DetectAndCompute(refImg, null, refKeyPoints, refDescriptors, false);
+            featureDetector.DetectAndCompute(image, null, imageKeyPoints, imageDescriptors, false);
 
             using var matcher = new BFMatcher(DistanceType.L2);
             var matches = new VectorOfVectorOfDMatch();
-            matcher.KnnMatch(refDescriptors, descriptors, matches, 2);
+            matcher.KnnMatch(refDescriptors, imageDescriptors, matches, 2);
 
-            // Use Lowe's ratio test
             var goodMatches = new VectorOfDMatch();
             for (int i = 0; i < matches.Size; i++)
             {
-                if (matches[i].Size >= 2 && matches[i][0].Distance < 0.75 * matches[i][1].Distance)
+                var match = matches[i];
+                if (match.Size >= 2 && match[0].Distance < 0.75 * match[1].Distance)
                 {
-                    goodMatches.Push(new[] { matches[i][0] });
+                    goodMatches.Push(new[] { match[0] });
                 }
             }
 
-            var homography = CvInvoke.FindHomography(ExtractPoints(keyPoints, goodMatches, true), ExtractPoints(refKeyPoints, goodMatches, false), HomographyMethod.Ransac, 5);
-            var aligned = new Mat();
-            CvInvoke.WarpPerspective(image, aligned, homography, refImg.Size);
-            return aligned;
+            var points1 = ExtractPoints(refKeyPoints, goodMatches, queryIdx: false);
+            var points2 = ExtractPoints(imageKeyPoints, goodMatches, queryIdx: true);
+            var homography = CvInvoke.FindHomography(points1, points2, RobustEstimationAlgorithm.Ransac, 5.0);
+
+            var result = new Mat();
+            CvInvoke.WarpPerspective(image, result, homography, refImg.Size, Inter.Linear, Warp.Default, BorderType.Reflect);
+            return result;
         }
 
-        private PointF[] ExtractPoints(VectorOfKeyPoint keyPoints, VectorOfDMatch matches, bool query)
+        private PointF[] ExtractPoints(VectorOfKeyPoint keyPoints, VectorOfDMatch matches, bool queryIdx)
         {
-            PointF[] pts = new PointF[matches.Size];
+            PointF[] points = new PointF[matches.Size];
             for (int i = 0; i < matches.Size; i++)
             {
-                int idx = query ? matches[i].QueryIdx : matches[i].TrainIdx;
-                pts[i] = keyPoints[idx].Point;
+                int index = queryIdx ? matches[i].QueryIdx : matches[i].TrainIdx;
+                points[i] = keyPoints[index].Point;
             }
-            return pts;
+            return points;
         }
     }
 }
